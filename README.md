@@ -1,7 +1,7 @@
 WordPress腾讯云COS对象存储插件（WPCOS）
 ----------------------------
 
-WordPress COS（简称:WPCOS），基于腾讯云COS存储与WordPress实现静态资源存储与COS存储中。提高网站项目的访问速度，以及静态资源的安全存储功能。
+WordPress COS（简称:WPCOS），基于腾讯云COS存储与WordPress实现静态资源到COS存储中。提高网站项目的访问速度，以及静态资源的安全存储功能。
 
 老蒋让zdl25同学帮助基于目前现有在Github上沈唁同学的Wordpress Qcloud Cos（[https://github.com/sy-records/wordpress-qcloud-cos][1]）这款插件基础上重构、借鉴、完善，采用最新腾讯云COS SDK文件，重写SDK部分，优化处理逻辑，优化文档和应用功能等。目前我们的WPCOS版本0.1发布出来，当然是免费大家使用，也希望大家提建议和修改意见。
 
@@ -19,9 +19,9 @@ WordPress COS（简称:WPCOS），基于腾讯云COS存储与WordPress实现静�
 
 1、插件下载地址
 
-    A - GitHub：[https://github.com/laobuluo/wpcos][2]
+    A - GitHub：https://github.com/laobuluo/wpcos
 
-    B - 备用镜像地址：[https://download.laobuluo.com/wordpress/wpcos.zip][3]
+    B - 备用镜像地址：https://download.laobuluo.com/wordpress/wpcos.zip
 
 2、安装插件
 
