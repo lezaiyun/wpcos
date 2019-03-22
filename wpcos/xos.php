@@ -2,7 +2,7 @@
 /**
 Plugin Name: WordPress COS（WPCOS）
 Plugin URI: https://www.laobuluo.com/2186.html
-Description: WordPress同步附件内容远程至腾讯云COS云存储中，实现网站数据与静态资源分离，提高网站加载速度。
+Description: WordPress同步附件内容远程至腾讯云COS云存储中，实现网站数据与静态资源分离，提高网站加载速度。站长互助QQ群： <a href="https://jq.qq.com/?_wv=1027&k=5gBE7Pt" target="_blank"> <font color="red">594467847</font></a>
 Version: 0.1
 Author: 老部落（By:zdl25）
 Author URI: https://www.laobuluo.com
