@@ -33,7 +33,7 @@ if (!empty($_POST)) {
         update_option('upload_url_path', trim(trim(stripslashes($_POST['upload_url_path'])), '/'));
 
 ?>
-    <div class="updated"><p><strong>设置已保存！</strong></p></div>
+    <div style="font-size: 25px;color: red; margin-top: 20px;font-weight: bold;"><p>WPCOS插件设置保存完毕!!!</p></div>
 
 <?php
 
@@ -42,8 +42,29 @@ if (!empty($_POST)) {
 
 ?>
 
+<style type="text/css">
+   table {
+    border-collapse: collapse;
+}
 
-<div class="wrap" style="margin: 10px;">
+table, td, th {border: 1px solid #cccccc;padding:5px;}
+.buttoncss {background-color: #4CAF50; 
+    border: none;cursor:pointer;
+    color: white;
+    padding: 15px 22px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;border-radius: 5px;
+    font-size: 12px;font-weight: bold;
+}
+.buttoncss:hover {
+    background-color: #008CBA;
+    color: white;
+}
+input{border: 1px solid #ccc;padding: 5px 0px;border-radius: 3px;padding-left:5px;}
+
+</style>
+<div style="margin:5px;">
     <h2>WordPress COS（WPCOS）腾讯云COS存储设置</h2>
     <hr/>
     
@@ -53,12 +74,12 @@ if (!empty($_POST)) {
         <p>站长互助QQ群： <a href="https://jq.qq.com/?_wv=1027&k=5gBE7Pt" target="_blank"> <font color="red">594467847</font></a>（宗旨：多做事，少说话，效率至上）</p>
    
       <hr/>
-    <form name="form1" method="post" action="<?php echo wp_nonce_url('./admin.php?page=' . XOS_BASEFOLDER . '/xos_actions.php'); ?>">
-        <table class="form-table">
+    <form action="<?php echo wp_nonce_url('./admin.php?page=' . XOS_BASEFOLDER . '/xos_actions.php'); ?>" name="wpcosform" method="post">
+        <table>
             <tr>
-                <th>
-                    <legend>存储桶名称</legend>
-                </th>
+                <td style="text-align:right;">
+                    <b>存储桶名称：</b>
+                </td>
                 <td>
                     <input type="text" name="bucket" value="<?php echo esc_attr($xos_options['bucket']); ?>" size="50"
                            placeholder="BUCKET 比如：laobuluo-xxxxxx"/>
@@ -68,71 +89,19 @@ if (!empty($_POST)) {
                 </td>
             </tr>
             <tr>
-                <th>
-                    <legend>存储桶所属地域</legend>
-                </th>
+                 <td style="text-align:right;">
+                    <b>存储桶所属地域：</b>
+               </td>
                 <td>
                     <input type="text" name="region" value="<?php echo esc_attr($xos_options['region']); ?>" size="50"
                            placeholder="存储桶 所属地域 比如：ap-shanghai"/>
                     <p>直接填写我们存储桶所属地区，示例：ap-shanghai</p>
                 </td>
             </tr>
-            <tr>
-                <th>
-                    <legend>APP ID 设置</legend>
-                </th>
-                <td>
-                    <input type="text" name="app_id" value="<?php echo esc_attr($xos_options['app_id']); ?>" size="50"
-                           placeholder="APP ID"/>
-
-                    
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    <legend>secretID 设置</legend>
-                </th>
-                <td><input type="text" name="secret_id" value="<?php echo esc_attr($xos_options['secret_id']); ?>" size="50" placeholder="secretID"/></td>
-            </tr>
-            <tr>
-                <th>
-                    <legend>secretKey 设置</legend>
-                </th>
-                <td>
-                    <input type="text" name="secret_key" value="<?php echo esc_attr($xos_options['secret_key']); ?>" size="50" placeholder="secretKey"/>
-                    <p>登入 <a href="https://console.qcloud.com/cam/capi" target="_blank">API密钥管理</a> 可以看到 <code>APPID | SecretId | SecretKey</code>。如果没有设置的需要创建一组。点击 <code>新建密钥</code></p>
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    <legend>不在本地保存</legend>
-                </th>
-                <td>
-                    <input type="checkbox"
-                           name="no_local_file" <?php if (esc_attr($xos_options['no_local_file']) == 'true') {
-						echo 'checked="TRUE"';
-					}
-					?> />
-
-                    <p>如果不想同步在服务器中备份静态文件就 "勾选"。我个人喜欢只存储在腾讯云COS中，这样缓解服务器存储量。</p>
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    <legend>本地文件夹：</legend>
-                </th>
-                <td>
-                    <input type="text" name="upload_path" value="<?php echo get_option('upload_path'); ?>" size="50"
-                           placeholder="请输入本地文件夹目录"/>
-
-                    <p>1. 静态文件在当前服务器的位置，例如： <code>wp-content/uploads</code> （不要用"/"开头和结尾），根目录输入<code>.</code>。</p>
-                    <p>2. 示范：<code>wp-content/uploads</code></p>
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    <legend>COS远程地址：</legend>
-                </th>
+<tr>
+               <td style="text-align:right;">
+                    <b>COS远程地址：</b>
+              </td>
                 <td>
                     <input type="text" name="upload_url_path" value="<?php echo get_option('upload_url_path'); ?>" size="50"
                            placeholder="请输入COS远程地址"/>
@@ -149,10 +118,63 @@ if (!empty($_POST)) {
                 </td>
             </tr>
             <tr>
+                <td style="text-align:right;">
+                    <b>APP ID 设置：</b>
+                </td>
+                <td>
+                    <input type="text" name="app_id" value="<?php echo esc_attr($xos_options['app_id']); ?>" size="50"
+                           placeholder="APP ID"/>
+
+                    
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:right;">
+                    <b>secretID 设置：</b>
+                 </td>
+                <td><input type="text" name="secret_id" value="<?php echo esc_attr($xos_options['secret_id']); ?>" size="50" placeholder="secretID"/></td>
+            </tr>
+            <tr>
+               <td style="text-align:right;">
+                    <b>secretKey 设置：</b>
+                 </td>
+                <td>
+                    <input type="text" name="secret_key" value="<?php echo esc_attr($xos_options['secret_key']); ?>" size="50" placeholder="secretKey"/>
+                    <p>登入 <a href="https://console.qcloud.com/cam/capi" target="_blank">API密钥管理</a> 可以看到 <code>APPID | SecretId | SecretKey</code>。如果没有设置的需要创建一组。点击 <code>新建密钥</code></p>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:right;">
+                    <b>不在本地保存：</b>
+                </td>
+                <td>
+                    <input type="checkbox"
+                           name="no_local_file" <?php if (esc_attr($xos_options['no_local_file']) == 'true') {
+						echo 'checked="TRUE"';
+					}
+					?> />
+
+                    <p>如果不想同步在服务器中备份静态文件就 "勾选"。我个人喜欢只存储在腾讯云COS中，这样缓解服务器存储量。</p>
+                </td>
+            </tr>
+            <tr>
+               <td style="text-align:right;">
+                    <b>本地文件夹：</b>
+                </td>
+                <td>
+                    <input type="text" name="upload_path" value="<?php echo get_option('upload_path'); ?>" size="50"
+                           placeholder="请输入本地文件夹目录"/>
+
+                    <p>1. 静态文件在当前服务器的位置，例如： <code>wp-content/uploads</code> （不要用"/"开头和结尾），根目录输入<code>.</code>。</p>
+                    <p>2. 示范：<code>wp-content/uploads</code></p>
+                </td>
+            </tr>
+            
+            <tr>
                 <th>
                     
                 </th>
-                <td><input type="submit" name="submit" value="保存WPCOS设置"/></td>
+                <td><input type="submit" name="submit" value="保存WPCOS设置" class="buttoncss" /></td>
 
             </tr>
         </table>
