@@ -19,9 +19,23 @@ function endWith($haystack, $needle) {
 class BucketStyleListener implements EventSubscriberInterface {
 
     private $appId;  // string: application id.
+    private $ip;
+    private $port;
+    private $ipport;
+    private $endpoint;
 
-    public function __construct($appId) {
+    public function __construct($appId, $ip=null, $port=null, $endpoint=null) {
         $this->appId = $appId;
+        $this->ip = $ip;
+        $this->port = $port;
+        $this->ipport = null;
+        $this->endpoint = $endpoint;
+        if ($ip != null) {
+            $this->ipport = $ip;
+            if ($port != null) {
+                $this->ipport = $ip.":".$port;
+            }
+        }
     }
 
     public static function getSubscribedEvents() {
@@ -33,13 +47,23 @@ class BucketStyleListener implements EventSubscriberInterface {
      * @param Event $event Event emitted.
      */
     public function onCommandAfterPrepare(Event $event) {
+
         $command = $event['command'];
         $bucket = $command['Bucket'];
         $request = $command->getRequest();
-
         if ($command->getName() == 'ListBuckets')
         {
-            $request->setHost('service.cos.myqcloud.com');
+            if ($this->ipport != null) {
+                $request->setHost($this->ipport);
+                $request->setHeader('Host', 'service.cos.myqcloud.com');
+            } else if ($this->endpoint != null) {
+                $request->setHost($this->endpoint);
+                $request->setHeader('Host', 'service.cos.myqcloud.com');
+            }
+            else {
+
+                $request->setHost('service.cos.myqcloud.com');
+            }
             return ;
         }
         if ($key = $command['Key']) {
@@ -55,12 +79,21 @@ class BucketStyleListener implements EventSubscriberInterface {
         {
             $bucket = $bucket.'-'.$this->appId;
         }
-        // Set the key and bucket on the request
+//        $request->setPath(urldecode($request->getPath()));
         $request->getParams()->set('bucket', $bucket)->set('key', $key);
 
-        //$request->setPath(urldecode($request->getPath()));
-        // Switch to virtual hosted bucket
-        $request->setHost($bucket. '.' . $request->getHost());
+        $realHost = $bucket. '.' . $request->getHost();
+        if($this->ipport != null) {
+            $request->setHost($this->ipport);
+            $request->setHeader('Host', $realHost);
+        } else {
+            if($this->endpoint != null) {
+                $tmp = $bucket. '.' . $this->endpoint;
+                $request->setHost($tmp);
+            } else {
+                $request->setHost($realHost);
+            }
+        }
         if (!$bucket) {
             $request->getParams()->set('cos.resource', '/');
         } else {
@@ -71,4 +104,4 @@ class BucketStyleListener implements EventSubscriberInterface {
             );
         }
     }
-}
+} 
