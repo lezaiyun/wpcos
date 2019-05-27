@@ -18,11 +18,19 @@ add_action('upgrader_process_complete', 'wpcos_upgrade_options');  # 插件升�
 
 # 避免上传插件/主题被同步到对象存储
 if (substr_count($_SERVER['REQUEST_URI'], '/update.php') <= 0) {
+	add_filter('wp_handle_upload', 'wpcos_upload_attachments');
 	add_filter('wp_generate_attachment_metadata', 'wpcos_upload_and_thumbs');
 }
+
+# 附件更新后触发
+add_filter( 'wp_update_attachment_metadata', 'wpcos_upload_and_thumbs' );
+
+# 检测不重复的文件名
+add_filter('wp_unique_filename', 'wpcos_unique_filename');
 
 # 删除文件时触发删除远端文件，该删除会默认删除缩略图
 add_action('delete_attachment', 'wpcos_delete_remote_attachment');
 
 # 添加插件设置菜单
 add_action('admin_menu', 'wpcos_add_setting_page');
+add_filter('plugin_action_links', 'wpcos_plugin_action_links', 10, 2);
