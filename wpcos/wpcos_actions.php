@@ -292,15 +292,13 @@ function wpcos_upload_attachments ($upload) {
  * @since 4.5.0
  *
  * @param string        $filename                 Unique file name.
- * @param string        $ext                      File extension, eg. ".png".
- *
- * @return string New filename, if given wasn't unique.
- */
-function wpcos_unique_filename( $filename, $ext ) {
-	if ( !$ext ) {
-		$ext = '.' . pathinfo( $filename, PATHINFO_EXTENSION );
-	}
 
+ * @return string New filename, if given wasn't unique
+ *
+ * 参数 $ext 在官方钩子文档中可以使用，部分 WP 版本因为多了这个参数就会报错。 返回“HTTP错误”
+ */
+function wpcos_unique_filename( $filename ) {
+	$ext = '.' . pathinfo( $filename, PATHINFO_EXTENSION );
 	$number = '';
 	while ( wpcos_remote_file_exists( wp_get_upload_dir()['subdir'] . "/$filename") ) {
 		$new_number = (int) $number + 1;
@@ -311,7 +309,6 @@ function wpcos_unique_filename( $filename, $ext ) {
 		}
 		$number = $new_number;
 	}
-
 	return $filename;
 }
 
