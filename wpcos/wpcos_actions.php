@@ -136,18 +136,15 @@ function wpcos_delete_remote_attachment($post_id) {
 		}
 	}
 }
-function wpcos_upload_and_thumbs( $metadata, $attachment_id) {
+function wpcos_upload_and_thumbs( $metadata ) {
 	$wpcos_options = get_option('wpcos_options');
 	$wp_uploads = wp_upload_dir();
 	if (isset( $metadata['file'] )) {
 		$attachment_key = '/' . $metadata['file'];
-		$attachment_local_path = $wp_uploads['basedir'] . $attachment_key; 
-	} else {
-		$attachment_local_path = get_attached_file( $attachment_id );
-		$attachment_key = str_replace( wp_get_upload_dir()['basedir'], '', $attachment_local_path );
+		$attachment_local_path = $wp_uploads['basedir'] . $attachment_key;
+		$opt = array('Content-Type' => $metadata['type']);
+		wpcos_file_upload($attachment_key, $attachment_local_path, $opt, $wpcos_options['no_local_file']);
 	}
-	$opt = array('Content-Type' => $metadata['type']);
-	wpcos_file_upload($attachment_key, $attachment_local_path, $opt, $wpcos_options['no_local_file']);
 	if (isset($metadata['sizes']) && count($metadata['sizes']) > 0) {
 		foreach ($metadata['sizes'] as $val) {
 			$attachment_thumbs_key = '/' . dirname($metadata['file']) . '/' . $val['file'];
