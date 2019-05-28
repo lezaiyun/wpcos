@@ -16,7 +16,9 @@ function wpcos_setting_page() {
 				if ($k =='no_local_file') {
 					$wpcos_options[$k] = (isset($_POST[$k])) ? True : False;
 				} else {
-					$wpcos_options[$k] = (isset($_POST[$k])) ? sanitize_text_field(trim(stripslashes($_POST[$k]))) : '';
+					if ($k != 'cos_url_path') {
+						$wpcos_options[$k] = (isset($_POST[$k])) ? sanitize_text_field(trim(stripslashes($_POST[$k]))) : '';
+					}
 				}
 			}
 			// 不管结果变没变，有提交则直接以提交的数据 更新wpcos_options
