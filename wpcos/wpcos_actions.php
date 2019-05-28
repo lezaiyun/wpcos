@@ -48,7 +48,7 @@ function wpcos_upgrade_options($plugin){
 }
 function wpcos_restore_options () {
 	$wpcos_options = get_option('wpcos_options');
-	$wpcos_options['cos_url_path'] = get_option('cos_url_path');
+	$wpcos_options['cos_url_path'] = get_option('upload_url_path');
 	update_option('wpcos_options', $wpcos_options);
 	update_option('upload_url_path', '');
 }
