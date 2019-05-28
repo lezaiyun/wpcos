@@ -1,45 +1,32 @@
 <?php
-/**
- *  插件设置页面
- */
 function wpcos_setting_page() {
-// 如果当前用户权限不足
 	if (!current_user_can('manage_options')) {
 		wp_die('Insufficient privileges!');
 	}
-
 	$wpcos_options = get_option('wpcos_options');
 	if ($wpcos_options && isset($_GET['_wpnonce']) && wp_verify_nonce($_GET['_wpnonce']) && !empty($_POST)) {
 		if($_POST['type'] == 'cos_info_set') {
-
 			foreach ($wpcos_options as $k => $v) {
 				if ($k =='no_local_file') {
 					$wpcos_options[$k] = (isset($_POST[$k])) ? True : False;
 				} else {
-					$wpcos_options[$k] = (isset($_POST[$k])) ? sanitize_text_field(trim(stripslashes($_POST[$k]))) : '';
+					if ($k != 'cos_url_path') {
+						$wpcos_options[$k] = (isset($_POST[$k])) ? sanitize_text_field(trim(stripslashes($_POST[$k]))) : '';
+					}
 				}
 			}
-			// 不管结果变没变，有提交则直接以提交的数据 更新wpcos_options
 			update_option('wpcos_options', $wpcos_options);
-
-			# 替换 upload_url_path 的值
 			update_option('upload_url_path', esc_url_raw(trim(trim(stripslashes($_POST['upload_url_path'])))));
-
 			?>
             <div style="font-size: 25px;color: red; margin-top: 20px;font-weight: bold;"><p>WPCOS插件设置保存完毕!!!</p></div>
-
 			<?php
-
 		}
 }
-
 ?>
-
     <style>
         table {
             border-collapse: collapse;
         }
-
         table, td, th {border: 1px solid #cccccc;padding:5px;}
         .buttoncss {background-color: #4CAF50;
             border: none;cursor:pointer;
@@ -59,12 +46,10 @@ function wpcos_setting_page() {
 <div style="margin:5px;">
     <h2>WordPress COS（WPCOS）腾讯云COS存储设置</h2>
     <hr/>
-    
         <p>WordPress COS（简称:WPCOS），基于腾讯云COS存储与WordPress实现静态资源到COS存储中。提高网站项目的访问速度，以及静态资源的安全存储功能。</p>
         <p>插件网站： <a href="https://www.laobuluo.com" target="_blank">老部落</a> / <a href="https://www.laobuluo.com/2186.html" target="_blank">WPCOS发布页面地址</a> / <a href="https://www.laobuluo.com/2196.html" target="_blank"> <font color="red">WPCOS安装详细教程</font></a></p>
         <p>优惠促销： <a href="https://www.laobuluo.com/tengxunyun/" target="_blank">最新腾讯云优惠汇总</a> / <a href="https://www.laobuluo.com/goto/qcloud-cos" target="_blank">腾讯云COS资源包优惠</a></p>
         <p>站长互助QQ群： <a href="https://jq.qq.com/?_wv=1027&k=5gBE7Pt" target="_blank"> <font color="red">594467847</font></a>（宗旨：多做事，少说话，效率至上）</p>
-   
       <hr/>
     <form action="<?php echo wp_nonce_url('./admin.php?page=' . WPCOS_BASEFOLDER . '/wpcos_actions.php'); ?>" name="wpcosform" method="post">
         <table>
