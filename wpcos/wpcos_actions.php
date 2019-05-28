@@ -215,10 +215,10 @@ function wpcos_delete_remote_attachment($post_id) {
 /**
  * 上传图片及缩略图
  * @param $metadata: 附件元数据
- * @param $attachment_id: id
  * @return array $metadata: 附件元数据
+ * 官方的钩子文档上写了可以添加 $attachment_id 参数，但实际测试过程中部分wp接收到不存在的参数时会报错，上传失败，返回报错为“HTTP错误”
  */
-function wpcos_upload_and_thumbs( $metadata, $attachment_id) {
+function wpcos_upload_and_thumbs( $metadata ) {
 	$wpcos_options = get_option('wpcos_options');
 	$wp_uploads = wp_upload_dir();  # 获取上传路径
 
@@ -227,20 +227,13 @@ function wpcos_upload_and_thumbs( $metadata, $attachment_id) {
 		// wp_upload_path['base_dir'] + metadata['file']
 		$attachment_key = '/' . $metadata['file'];  // 远程key路径
 		$attachment_local_path = $wp_uploads['basedir'] . $attachment_key;  # 在本地的存储路径
-	} else {
-		$attachment_local_path = get_attached_file( $attachment_id );
-		$attachment_key = str_replace( wp_get_upload_dir()['basedir'], '', $attachment_local_path );  # 必须以/开头
+		$opt = array('Content-Type' => $metadata['type']);  # 设置可选参数
+		wpcos_file_upload($attachment_key, $attachment_local_path, $opt, $wpcos_options['no_local_file']);  # 调用上传函数
 	}
-
-	$opt = array('Content-Type' => $metadata['type']);  # 设置可选参数
-
 
 //		$f = fopen(wp_upload_dir()['path'] . '/x.txt', 'w');
 //		fwrite($f, var_export(array('k' => $attachment_key, 'loacl_path' => $attachment_local_path, 'opt' => $opt, 'id' => $attachment_id, 'meta' => $metadata), true));
 //		fclose($f);
-
-	wpcos_file_upload($attachment_key, $attachment_local_path, $opt, $wpcos_options['no_local_file']);  # 调用上传函数
-
 
 	# 如果存在缩略图则上传缩略图
 	if (isset($metadata['sizes']) && count($metadata['sizes']) > 0) {
@@ -259,11 +252,6 @@ function wpcos_upload_and_thumbs( $metadata, $attachment_id) {
 //			}
 		}
 	}
-
-	// 如果上传成功，且不再本地保存，在此删除本地文件
-//	if ($wpcos_options['no_local_file']) {
-//		wpcos_delete_local_file( $attachment_local_path );
-//	}
 
 	return $metadata;
 }
