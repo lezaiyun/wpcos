@@ -172,10 +172,8 @@ function wpcos_upload_attachments ($upload) {
 	}
 	return $upload;
 }
-function wpcos_unique_filename( $filename, $ext ) {
-	if ( !$ext ) {
-		$ext = '.' . pathinfo( $filename, PATHINFO_EXTENSION );
-	}
+function wpcos_unique_filename( $filename ) {
+	$ext = '.' . pathinfo( $filename, PATHINFO_EXTENSION );
 	$number = '';
 	while ( wpcos_remote_file_exists( wp_get_upload_dir()['subdir'] . "/$filename") ) {
 		$new_number = (int) $number + 1;
