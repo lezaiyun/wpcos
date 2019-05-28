@@ -17,14 +17,20 @@ function wpcos_set_options() {
 		'secret_id' => "",
 		'secret_key' => "",
 		'no_local_file' => False,  # 不在本地保留备份
+	    'cos_url_path' => '',
 	);
-	if(!get_option('wpcos_options')){
+	$wpcos_options = get_option('wpcos_options');
+	if(!$wpcos_options){
 		if (get_option('xos_options')) {
 			wpcos_upgrade_options('wpcos');
 		} else {
 			add_option('wpcos_options', $options, '', 'yes');
 		}
 	};
+
+	if ( isset($wpcos_options['cos_url_path']) && $wpcos_options['cos_url_path'] != '' ) {
+		update_option('upload_url_path', $wpcos_options['cos_url_path']);
+	}
 }
 
 
@@ -51,6 +57,14 @@ function wpcos_upgrade_options($plugin){
 			delete_option('xos_options');
 		}
 	}
+}
+
+
+function wpcos_restore_options () {
+	$wpcos_options = get_option('wpcos_options');
+	$wpcos_options['cos_url_path'] = get_option('cos_url_path');
+	update_option('wpcos_options', $wpcos_options);
+	update_option('upload_url_path', '');
 }
 
 

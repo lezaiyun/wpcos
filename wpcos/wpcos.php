@@ -12,7 +12,7 @@ require_once 'wpcos_actions.php';
 
 # 插件 activation 函数当一个插件在 WordPress 中”activated(启用)”时被触发。
 register_activation_hook(__FILE__, 'wpcos_set_options');
-# register_deactivation_hook(__FILE__, 'wpcos_restore_options');  # 禁用时触发钩子
+register_deactivation_hook(__FILE__, 'wpcos_restore_options');  # 禁用时触发钩子
 
 add_action('upgrader_process_complete', 'wpcos_upgrade_options');  # 插件升级完成时执行
 
