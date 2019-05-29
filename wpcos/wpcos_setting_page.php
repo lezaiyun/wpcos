@@ -18,7 +18,7 @@ function wpcos_setting_page() {
 			update_option('wpcos_options', $wpcos_options);
 			update_option('upload_url_path', esc_url_raw(trim(trim(stripslashes($_POST['upload_url_path'])))));
 			?>
-            <div style="font-size: 25px;color: red; margin-top: 20px;font-weight: bold;"><p>WPCOS插件设置保存完毕!!!</p></div>
+            <div class="update-nag">WPCOS插件设置保存完毕!!!</div>
 			<?php
 		}
 }
@@ -47,15 +47,15 @@ function wpcos_setting_page() {
     <h2>WordPress COS（WPCOS）腾讯云COS存储设置</h2>
     <hr/>
         <p>WordPress COS（简称:WPCOS），基于腾讯云COS存储与WordPress实现静态资源到COS存储中。提高网站项目的访问速度，以及静态资源的安全存储功能。</p>
-        <p>插件网站： <a href="https://www.laobuluo.com" target="_blank">老部落</a> / <a href="https://www.laobuluo.com/2186.html" target="_blank">WPCOS发布页面地址</a> / <a href="https://www.laobuluo.com/2196.html" target="_blank"> <font color="red">WPCOS安装详细教程</font></a></p>
+        <p>插件网站： <a href="https://www.laobuluo.com" target="_blank">老部落</a> / <a href="https://www.laobuluo.com/2186.html" target="_blank">WPCOS发布页面地址</a> / <a href="https://www.laobuluo.com/2196.html" target="_blank"> <font color="red">WPCOS安装详细教程</font></a> / 站长互助QQ群： <a href="https://jq.qq.com/?_wv=1027&k=5gBE7Pt" target="_blank"> <font color="red">594467847</font></a>（宗旨：多做事，少说话，效率至上）</p>
         <p>优惠促销： <a href="https://www.laobuluo.com/tengxunyun/" target="_blank">最新腾讯云优惠汇总</a> / <a href="https://www.laobuluo.com/goto/qcloud-cos" target="_blank">腾讯云COS资源包优惠</a></p>
-        <p>站长互助QQ群： <a href="https://jq.qq.com/?_wv=1027&k=5gBE7Pt" target="_blank"> <font color="red">594467847</font></a>（宗旨：多做事，少说话，效率至上）</p>
+       
       <hr/>
     <form action="<?php echo wp_nonce_url('./admin.php?page=' . WPCOS_BASEFOLDER . '/wpcos_actions.php'); ?>" name="wpcosform" method="post">
         <table>
             <tr>
                 <td style="text-align:right;">
-                    <b>存储桶名称：</b>
+                    <b>空间名称：</b>
                 </td>
                 <td>
                     <input type="text" name="bucket" value="<?php echo esc_attr($wpcos_options['bucket']); ?>" size="50"
@@ -67,7 +67,7 @@ function wpcos_setting_page() {
             </tr>
             <tr>
                  <td style="text-align:right;">
-                    <b>存储桶所属地域：</b>
+                    <b>所属地域：</b>
                </td>
                 <td>
                     <input type="text" name="region" value="<?php echo esc_attr($wpcos_options['region']); ?>" size="50"
@@ -77,26 +77,22 @@ function wpcos_setting_page() {
             </tr>
 <tr>
                <td style="text-align:right;">
-                    <b>COS远程地址：</b>
+                    <b>访问域名：</b>
               </td>
                 <td>
                     <input type="text" name="upload_url_path" value="<?php echo esc_url(get_option('upload_url_path')); ?>" size="50"
                            placeholder="请输入COS远程地址"/>
 
                     <p><b>设置注意事项：</b></p>
-
-                    <p>1. 一般我们是以：<code>http://{cos域名}/{本地文件夹}</code>，同样不要用"/"结尾。</p>
-
+                    <p>1. 一般我们是以：<code>http://{cos域名}</code>，同样不要用"<code>/</code>"结尾。</p>
                     <p>2. <code>{cos域名}</code> 是需要在设置的存储桶中查看的。"存储桶列表"，当前存储桶的"基础配置"的"访问域名"中。</p>
-
                     <p>3. 如果我们自定义域名的，<code>{cos域名}</code> 则需要用到我们自己自定义的域名。</p>
-                    <p>4. 示范1： <code>https://laobuluo-xxxxxxx.cos.ap-shanghai.myqcloud.com/wp-content/uploads</code></p>
-                    <p>5. 示范2： <code>https://cos.laobuluo.com/wp-content/uploads</code></p>
+                    
                 </td>
             </tr>
             <tr>
                 <td style="text-align:right;">
-                    <b>APP ID 设置：</b>
+                    <b>APPID 设置：</b>
                 </td>
                 <td>
                     <input type="text" name="app_id" value="<?php echo esc_attr($wpcos_options['app_id']); ?>" size="50"
@@ -107,13 +103,13 @@ function wpcos_setting_page() {
             </tr>
             <tr>
                 <td style="text-align:right;">
-                    <b>secretID 设置：</b>
+                    <b>SecretId 设置：</b>
                  </td>
                 <td><input type="text" name="secret_id" value="<?php echo esc_attr($wpcos_options['secret_id']); ?>" size="50" placeholder="secretID"/></td>
             </tr>
             <tr>
                <td style="text-align:right;">
-                    <b>secretKey 设置：</b>
+                    <b>SecretKey 设置：</b>
                  </td>
                 <td>
                     <input type="text" name="secret_key" value="<?php echo esc_attr($wpcos_options['secret_key']); ?>" size="50" placeholder="secretKey"/>
