@@ -9,14 +9,19 @@ Author URI: https://www.laobuluo.com
 */
 
 require_once 'wpcos_actions.php';
+$current_wp_version = get_bloginfo('version');
 register_activation_hook(__FILE__, 'wpcos_set_options');
 register_deactivation_hook(__FILE__, 'wpcos_restore_options');
 add_action('upgrader_process_complete', 'wpcos_upgrade_options');
 if (substr_count($_SERVER['REQUEST_URI'], '/update.php') <= 0) {
-	add_filter('wp_handle_upload', 'wpcos_upload_attachments');
-	add_filter('wp_generate_attachment_metadata', 'wpcos_upload_and_thumbs');
+    add_filter('wp_handle_upload', 'wpcos_upload_attachments');
+    if ( (float)$current_wp_version >= 5.3 ) {
+        add_filter('wp_generate_attachment_metadata', 'wpcos_upload_and_thumbs');
+    }
 }
-add_filter( 'wp_update_attachment_metadata', 'wpcos_upload_and_thumbs' );
+if ( (float)$current_wp_version < 5.3 ){
+    add_filter( 'wp_update_attachment_metadata', 'wpcos_upload_and_thumbs' );
+}
 add_filter('wp_unique_filename', 'wpcos_unique_filename');
 add_action('delete_attachment', 'wpcos_delete_remote_attachment');
 add_action('admin_menu', 'wpcos_add_setting_page');
