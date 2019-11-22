@@ -4,8 +4,8 @@ Contributors: laobuluo
 Donate link: https://www.laobuluo.com/donate/
 Tags:腾讯云COS,腾讯云对象存储,腾讯云wordpress,腾讯云存储分离,腾讯云存储
 Requires at least: 4.5.0
-Tested up to: 5.2.1
-Stable tag: 1.1
+Tested up to: 5.3
+Stable tag: 1.2
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -56,6 +56,11 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 * 7. 官方插件中心合规性修改
 * 8. 插件列表项中添加设置链接，方便用户配置
 * 9. 使用wordpress图片编辑功能生成的图片保存并同步支持
+
+= 1.2 =
+* 1. 在最新WordPress5.3正式版兼容支持
+* 2. 修改最新版本WP图片处理流程方式
+
 
 == Upgrade Notice ==
 * 
