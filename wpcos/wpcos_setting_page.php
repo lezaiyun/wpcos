@@ -9,7 +9,9 @@ function wpcos_setting_page() {
 			foreach ($wpcos_options as $k => $v) {
 				if ($k =='no_local_file') {
 					$wpcos_options[$k] = (isset($_POST[$k])) ? True : False;
-				} else {
+				} elseif($k =='opt') {
+					$wpcos_options[$k]['auto_rename'] = (isset($_POST['auto_rename'])) ? 1 : 0;
+                } else {
 					if ($k != 'cos_url_path') {
 						$wpcos_options[$k] = (isset($_POST[$k])) ? sanitize_text_field(trim(stripslashes($_POST[$k]))) : '';
 					}
@@ -83,10 +85,12 @@ function wpcos_setting_page() {
                     <input type="text" name="upload_url_path" value="<?php echo esc_url(get_option('upload_url_path')); ?>" size="50"
                            placeholder="请输入COS远程地址"/>
 
-                    <p><b>设置注意事项：</b></p>
-                    <p>1. 一般我们是以：<code>http://{cos域名}</code>，同样不要用"<code>/</code>"结尾。</p>
-                    <p>2. <code>{cos域名}</code> 是需要在设置的存储桶中查看的。"存储桶列表"，当前存储桶的"基础配置"的"访问域名"中。</p>
-                    <p>3. 如果我们自定义域名的，<code>{cos域名}</code> 则需要用到我们自己自定义的域名。</p>
+                   <p><b>设置注意事项：</b></p>
+                    <p>1. 一般我们是以：<code>http://{cos域名}</code>/<code>自定义文件夹</code>，不要用"<code>/</code>"结尾。</p>
+                    <p>2. <code>{cos域名}</code> 是需要在设置的存储桶中查看的。"存储桶列表"，当前存储桶的"基础配置"的"访问域名"中。或者自定义的域名。</p>
+                    <p>3. 示范1：<code>https://laojiang-xxxxxx.cos.ap-shanghai.myqcloud.com</code></p>
+                    <p>4. 示范2：<code>https://laojiang-xxxxxx.cos.ap-shanghai.myqcloud.com/wp-content/uploads</code></p>
+                    <p>5. 示范3：<code>https://laojiang-xxxxxx.cos.ap-shanghai.myqcloud.com/laobuluo</code></p>
                     
                 </td>
             </tr>
@@ -118,6 +122,23 @@ function wpcos_setting_page() {
             </tr>
             <tr>
                 <td style="text-align:right;">
+                    <b>自动重命名：</b>
+                </td>
+                <td>
+                    <input type="checkbox"
+                           name="auto_rename"
+				        <?php
+				        if ($wpcos_options['opt']['auto_rename']) {
+					        echo 'checked="TRUE"';
+				        }
+				        ?>
+                    />
+
+                   <p>自动重命名，如果已有安装相关插件和脚本，可不勾选</p>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:right;">
                     <b>不在本地保存：</b>
                 </td>
                 <td>
@@ -140,6 +161,15 @@ function wpcos_setting_page() {
                 </th>
                 <td><input type="submit" name="submit" value="保存WPCOS设置" class="buttoncss" /></td>
 
+            </tr>
+             <tr>
+                 <td style="text-align:right;">
+                    <b>注意事项：</b>
+                </td>
+                <td>
+                    <p>1. 在测试插件可用之后，已有静态文件可以使用"COSBrowser"等工具迁移【 <a href="https://cloud.tencent.com/document/product/436/11366" target="_blank">工具官方</a> 】，教程 <a href="https://www.itbulu.com/cosbrowser-cos.html" target="_blank">参考这里</a> 。</p>
+                    <p>2. 已有网站迁移静态文件后，内容数据库静态URL地址替换建议使用【wpreplace】批量替换插件。</p>
+                </td>
             </tr>
         </table>
         

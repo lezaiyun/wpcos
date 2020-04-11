@@ -1,9 +1,9 @@
 <?php
 require_once 'sdk/cos-php-sdk-v5/vendor/autoload.php';
-define( 'WPCOS_VERSION', 0.2 );
+define( 'WPCOS_VERSION', 1.3 );
 define( 'WPCOS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-define('WPCOS_BASENAME', plugin_basename(__FILE__));
-define('WPCOS_BASEFOLDER', plugin_basename(dirname(__FILE__)));
+define( 'WPCOS_BASENAME', plugin_basename(__FILE__) );
+define( 'WPCOS_BASEFOLDER', plugin_basename(dirname(__FILE__)) );
 function wpcos_set_options() {
     $options = array(
 	    'version' => WPCOS_VERSION,
@@ -14,6 +14,9 @@ function wpcos_set_options() {
 		'secret_key' => "",
 		'no_local_file' => False,
 	    'cos_url_path' => '',
+	    'opt' => array(
+	    	'auto_rename' => 0,
+	    ),
 	);
 	$wpcos_options = get_option('wpcos_options');
 	if(!$wpcos_options){
@@ -44,11 +47,22 @@ function wpcos_upgrade_options($plugin){
 			add_option('wpcos_options', $wpcos_options, '', 'yes');
 			delete_option('xos_options');
 		}
+
+		if (!array_key_exists('opt', $wpcos_options)) {
+			$wpcos_options['opt'] = array(
+				'auto_rename' => 0,
+			);
+		}
 	}
 }
 function wpcos_restore_options () {
 	$wpcos_options = get_option('wpcos_options');
 	$wpcos_options['cos_url_path'] = get_option('upload_url_path');
+	if (!array_key_exists('opt', $wpcos_options)) {
+		$wpcos_options['opt'] = array(
+			'auto_rename' => 0,
+		);
+	}
 	update_option('wpcos_options', $wpcos_options);
 	update_option('upload_url_path', '');
 }
@@ -81,10 +95,11 @@ function wpcos_client () {
 function wpcos_remote_file_exists ($key) {
 	$cosClient = wpcos_client();
 	$wpcos_options = get_option('wpcos_options');
+    $upload_url_path = get_option('upload_url_path');
 	try {
 		$cosClient->headObject(array(
 			'Bucket' => $wpcos_options['bucket'],
-			'Key' => $key,
+			'Key' => wpcos_key_handle($key, $upload_url_path),
 		));
 		return True;
 	} catch (\Exception $e) {
@@ -94,10 +109,11 @@ function wpcos_remote_file_exists ($key) {
 function wpcos_file_upload($key, $file_local_path, $opt = array(), $no_local_file = False) {
 	$cosClient = wpcos_client();
 	$wpcos_options = get_option('wpcos_options');
+    $upload_url_path = get_option('upload_url_path');
 	try {
 		$cosClient->Upload(
 			$wpcos_options['bucket'],
-			$key,
+            wpcos_key_handle($key, $upload_url_path),
 			$body = fopen($file_local_path, 'rb')
 		);
 		if ($no_local_file) {
@@ -109,19 +125,22 @@ function wpcos_file_upload($key, $file_local_path, $opt = array(), $no_local_fil
 }
 function wpcos_delete_remote_attachment($post_id) {
 	$deleteObjects = array();
-	$meta = wp_get_attachment_metadata( $post_id );
+	$meta = wp_get_attachment_metadata( $post_id );  // 以下获取的key都不以/开头, 但该sdk方法必须非/开头
+    $upload_url_path = get_option('upload_url_path');
 	if (isset($meta['file'])) {
-		$attachment_key = $meta['file'];
-		array_push($deleteObjects, array( 'Key' => $attachment_key, ));
+		$attachment_key = '/' . $meta['file'];
+		array_push($deleteObjects, array( 'Key' => ltrim(wpcos_key_handle($attachment_key, $upload_url_path), '/'), ));
 	} else {
 		$file = get_attached_file( $post_id );
-		$attached_key = str_replace( wp_get_upload_dir()['basedir'] . '/', '', $file );
-		$deleteObjects[] = array( 'Key' => $attached_key, );
+		if ($file) {
+			$attached_key = '/' . str_replace( wp_get_upload_dir()['basedir'] . '/', '', $file );
+			$deleteObjects[] = array( 'Key' => ltrim(wpcos_key_handle($attached_key, $upload_url_path), '/'), );
+		}
 	}
 	if (isset($meta['sizes']) && count($meta['sizes']) > 0) {
 		foreach ($meta['sizes'] as $val) {
-			$attachment_thumbs_key = dirname($meta['file']) . '/' . $val['file'];
-			$deleteObjects[] = array( 'Key' => $attachment_thumbs_key, );
+			$attachment_thumbs_key = '/' . dirname($meta['file']) . '/' . $val['file'];
+			$deleteObjects[] = array( 'Key' => ltrim(wpcos_key_handle($attachment_thumbs_key, $upload_url_path), '/'), );
 		}
 	}
 	if ( !empty( $deleteObjects ) ) {
@@ -175,7 +194,8 @@ function wpcos_upload_attachments ($upload) {
 function wpcos_unique_filename( $filename ) {
 	$ext = '.' . pathinfo( $filename, PATHINFO_EXTENSION );
 	$number = '';
-	while ( wpcos_remote_file_exists( wp_get_upload_dir()['subdir'] . "/$filename") ) {
+    $upload_url_path = get_option('upload_url_path');
+	while ( wpcos_remote_file_exists( wpcos_key_handle(wp_get_upload_dir()['subdir'] . "/$filename", $upload_url_path)) ) {
 		$new_number = (int) $number + 1;
 		if ( '' == "$number$ext" ) {
 			$filename = "$filename-" . $new_number;
@@ -186,6 +206,26 @@ function wpcos_unique_filename( $filename ) {
 	}
 	return $filename;
 }
+
+function wpcos_key_handle($key, $upload_url_path){
+    # 参数2 为了减少option的获取次数
+    $url_parse = wp_parse_url($upload_url_path);
+    # 约定url不要以/结尾，减少判断条件
+    if (array_key_exists('path', $url_parse)) {
+        $key = $url_parse['path'] . $key;
+    }
+    return $key;
+}
+
+function wpcos_sanitize_file_name( $filename ){
+	$wpcos_options = get_option('wpcos_options');
+	if ($wpcos_options['opt']['auto_rename']) {
+		return date("YmdHis") . "" . mt_rand(100, 999) . "." . pathinfo($filename, PATHINFO_EXTENSION);
+	} else {
+		return $filename;
+	}
+}
+
 function wpcos_add_setting_page() {
 	if (!function_exists('wpcos_setting_page')) {
 		require_once 'wpcos_setting_page.php';
