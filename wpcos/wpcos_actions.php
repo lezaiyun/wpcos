@@ -1,6 +1,6 @@
 <?php
 require_once 'sdk/cos-php-sdk-v5/vendor/autoload.php';
-define( 'WPCOS_VERSION', 1.3 );
+define( 'WPCOS_VERSION', 1.5 );
 define( 'WPCOS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WPCOS_BASENAME', plugin_basename(__FILE__) );
 define( 'WPCOS_BASEFOLDER', plugin_basename(dirname(__FILE__)) );
@@ -46,12 +46,14 @@ function wpcos_upgrade_options($plugin){
 			$wpcos_options['version'] = WPCOS_VERSION;
 			add_option('wpcos_options', $wpcos_options, '', 'yes');
 			delete_option('xos_options');
-		}
-
-		if (!array_key_exists('opt', $wpcos_options)) {
-			$wpcos_options['opt'] = array(
-				'auto_rename' => 0,
-			);
+		} else {
+			$wpcos_options = get_option('wpcos_options');
+			if (!array_key_exists('opt', $wpcos_options)) {
+				$wpcos_options['opt'] = array(
+					'auto_rename' => 0,
+				);
+				update_option('wpcos_options', $wpcos_options);
+			}
 		}
 	}
 }
@@ -230,11 +232,65 @@ function wpcos_add_setting_page() {
 	if (!function_exists('wpcos_setting_page')) {
 		require_once 'wpcos_setting_page.php';
 	}
-	add_menu_page('WPCOS设置', 'WPCOS设置', 'manage_options', __FILE__, 'wpcos_setting_page');
+	add_options_page('WPCOS设置', 'WPCOS设置', 'manage_options', __FILE__, 'wpcos_setting_page');
 }
 function wpcos_plugin_action_links($links, $file) {
 	if ($file == plugin_basename(dirname(__FILE__) . '/wpcos.php')) {
 		$links[] = '<a href="admin.php?page=' . WPCOS_BASEFOLDER . '/wpcos_actions.php">设置</a>';
 	}
 	return $links;
+}
+
+function wpcos_set_thumbsize($set_thumb){
+	$wpcos_options = get_option('wpcos_options');
+	if($set_thumb) {
+		$wpcos_options['opt']['thumbsize'] = array(
+			'thumbnail_size_w' => get_option('thumbnail_size_w'),
+			'thumbnail_size_h' => get_option('thumbnail_size_h'),
+			'medium_size_w'    => get_option('medium_size_w'),
+			'medium_size_h'    => get_option('medium_size_h'),
+			'large_size_w'     => get_option('large_size_w'),
+			'large_size_h'     => get_option('large_size_h'),
+			'medium_large_size_w' => get_option('medium_large_size_w'),
+			'medium_large_size_h' => get_option('medium_large_size_h'),
+		);
+		update_option('thumbnail_size_w', 0);
+		update_option('thumbnail_size_h', 0);
+		update_option('medium_size_w', 0);
+		update_option('medium_size_h', 0);
+		update_option('large_size_w', 0);
+		update_option('large_size_h', 0);
+		update_option('medium_large_size_w', 0);
+		update_option('medium_large_size_h', 0);
+		update_option('wpcos_options', $wpcos_options);
+	} else {
+		if(isset($wpcos_options['opt']['thumbsize'])) {
+			update_option('thumbnail_size_w', $wpcos_options['opt']['thumbsize']['thumbnail_size_w']);
+			update_option('thumbnail_size_h', $wpcos_options['opt']['thumbsize']['thumbnail_size_h']);
+			update_option('medium_size_w', $wpcos_options['opt']['thumbsize']['medium_size_w']);
+			update_option('medium_size_h', $wpcos_options['opt']['thumbsize']['medium_size_h']);
+			update_option('large_size_w', $wpcos_options['opt']['thumbsize']['large_size_w']);
+			update_option('large_size_h', $wpcos_options['opt']['thumbsize']['large_size_h']);
+			update_option('medium_large_size_w', $wpcos_options['opt']['thumbsize']['medium_large_size_w']);
+			update_option('medium_large_size_h', $wpcos_options['opt']['thumbsize']['medium_large_size_h']);
+			unset($wpcos_options['opt']['thumbsize']);
+			update_option('wpcos_options', $wpcos_options);
+		}
+	}
+}
+function wpcos_legacy_data_replace() {
+	global $wpdb;
+
+	$wpcos_options = get_option('wpcos_options');
+	$originalContent = home_url('/wp-content/uploads');
+	$newContent = get_option('upload_url_path');
+
+	# 文章内容文字/字符替换
+	$result = $wpdb->query(
+		"UPDATE {$wpdb->prefix}posts SET `post_content` = REPLACE( `post_content`, '{$originalContent}', '{$newContent}');"
+	);
+
+	$wpcos_options['opt']['wpcos_legacy_data_replace'] = 1;
+	update_option('wpcos_options', $wpcos_options);
+	return $wpcos_options;
 }

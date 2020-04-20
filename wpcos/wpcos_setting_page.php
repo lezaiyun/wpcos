@@ -19,111 +19,97 @@ function wpcos_setting_page() {
 			}
 			update_option('wpcos_options', $wpcos_options);
 			update_option('upload_url_path', esc_url_raw(trim(trim(stripslashes($_POST['upload_url_path'])))));
+			wpcos_set_thumbsize(isset($_POST['disable_thumb']) ? True : False);
+			$wpcos_options = get_option('wpcos_options');
 			?>
-            <div class="update-nag">WPCOS插件设置保存完毕!!!</div>
+            <div class="updated">WPCOS插件设置已保存。</div>
 			<?php
 		}
+		else if($_POST['type'] == 'cos_info_replace') {
+			$wpcos_options = wpcos_legacy_data_replace();
+        }
 }
 ?>
-    <style>
-        table {
-            border-collapse: collapse;
-        }
-        table, td, th {border: 1px solid #cccccc;padding:5px;}
-        .buttoncss {background-color: #4CAF50;
-            border: none;cursor:pointer;
-            color: white;
-            padding: 15px 22px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;border-radius: 5px;
-            font-size: 12px;font-weight: bold;
-        }
-        .buttoncss:hover {
-            background-color: #008CBA;
-            color: white;
-        }
-        input{border: 1px solid #ccc;padding: 5px 0px;border-radius: 3px;padding-left:5px;}
-    </style>
-<div style="margin:5px;">
-    <h2>WordPress COS（WPCOS）腾讯云COS存储设置</h2>
-    <hr/>
-        <p>WordPress COS（简称:WPCOS），基于腾讯云COS存储与WordPress实现静态资源到COS存储中。提高网站项目的访问速度，以及静态资源的安全存储功能。</p>
-        <p>插件网站： <a href="https://www.laobuluo.com" target="_blank">老部落</a> / <a href="https://www.laobuluo.com/2186.html" target="_blank">WPCOS发布页面地址</a> / <a href="https://www.laobuluo.com/2196.html" target="_blank"> <font color="red">WPCOS安装详细教程</font></a> / 站长互助QQ群： <a href="https://jq.qq.com/?_wv=1027&k=5gBE7Pt" target="_blank"> <font color="red">594467847</font></a>（宗旨：多做事，少说话，效率至上）</p>
-        <p>优惠促销： <a href="https://www.laobuluo.com/tengxunyun/" target="_blank">最新腾讯云优惠汇总</a> / <a href="https://www.laobuluo.com/goto/qcloud-cos" target="_blank">腾讯云COS资源包优惠</a></p>
-       
+   
+<div class="wrap">
+    <h1 class="wp-heading-inline">腾讯云COS对象存储插件(WPCOS)设置</h1> <a href="https://www.laobuluo.com/2186.html" target="_blank"><span class="page-title-action">插件介绍</span></a>
+    
+    <p>插件介绍：WPCOS插件，可实现WordPress静态文件分离至腾讯云对象存储COS，提高网站访问速度。</p>
+        <p>快速导航： <a href="https://www.laobuluo.com/tengxunyun/" target="_blank"><font color="red">最新腾讯云优惠活动（云服务器/对象存储包）</font></a> / 站长QQ群： <a href="https://jq.qq.com/?_wv=1027&k=5gBE7Pt" target="_blank"> <font color="red">594467847</font></a>（交流建站和运营） / 公众号：QQ69377078（插件反馈）</p>
+              
       <hr/>
-    <form action="<?php echo wp_nonce_url('./admin.php?page=' . WPCOS_BASEFOLDER . '/wpcos_actions.php'); ?>" name="wpcosform" method="post">
-        <table>
+        <table class="form-table">
+            <form action="<?php echo wp_nonce_url('./admin.php?page=' . WPCOS_BASEFOLDER . '/wpcos_actions.php'); ?>" name="wpcosform" method="post">
             <tr>
-                <td style="text-align:right;">
-                    <b>空间名称：</b>
-                </td>
+                <th scope="row">
+                    空间名称
+                </th>
                 <td>
-                    <input type="text" name="bucket" value="<?php echo esc_attr($wpcos_options['bucket']); ?>" size="50"
+                    <input type="text" name="bucket" value="<?php echo esc_attr($wpcos_options['bucket']); ?>" size="40"
                            placeholder="BUCKET 比如：laobuluo-xxxxxx"/>
 
-                    <p>1. 需要在腾讯云创建<code>bucket</code>存储桶。注意：填写"存储桶名称-对应ID"。</p>
-                    <p>2. 示范： <code>laobuluo-xxxxxx</code></p>
-                </td>
-            </tr>
-            <tr>
-                 <td style="text-align:right;">
-                    <b>所属地域：</b>
-               </td>
-                <td>
-                    <input type="text" name="region" value="<?php echo esc_attr($wpcos_options['region']); ?>" size="50"
-                           placeholder="存储桶 所属地域 比如：ap-shanghai"/>
-                    <p>直接填写我们存储桶所属地区，示例：ap-shanghai</p>
-                </td>
-            </tr>
-<tr>
-               <td style="text-align:right;">
-                    <b>访问域名：</b>
-              </td>
-                <td>
-                    <input type="text" name="upload_url_path" value="<?php echo esc_url(get_option('upload_url_path')); ?>" size="50"
-                           placeholder="请输入COS远程地址"/>
-
-                   <p><b>设置注意事项：</b></p>
-                    <p>1. 一般我们是以：<code>http://{cos域名}</code>/<code>自定义文件夹</code>，不要用"<code>/</code>"结尾。</p>
-                    <p>2. <code>{cos域名}</code> 是需要在设置的存储桶中查看的。"存储桶列表"，当前存储桶的"基础配置"的"访问域名"中。或者自定义的域名。</p>
-                    <p>3. 示范1：<code>https://laojiang-xxxxxx.cos.ap-shanghai.myqcloud.com</code></p>
-                    <p>4. 示范2：<code>https://laojiang-xxxxxx.cos.ap-shanghai.myqcloud.com/wp-content/uploads</code></p>
-                    <p>5. 示范3：<code>https://laojiang-xxxxxx.cos.ap-shanghai.myqcloud.com/laobuluo</code></p>
+                    <p>需要在腾讯云创建<code>bucket</code>存储桶。注意：填写"存储桶名称-对应ID". 示范： <code>laobuluo-xxxxxx</code></p>
                     
                 </td>
             </tr>
             <tr>
-                <td style="text-align:right;">
-                    <b>APPID 设置：</b>
-                </td>
+                 <th scope="row">
+                   所属地域
+                </th>
+                 
                 <td>
-                    <input type="text" name="app_id" value="<?php echo esc_attr($wpcos_options['app_id']); ?>" size="50"
+                    <input type="text" name="region" value="<?php echo esc_attr($wpcos_options['region']); ?>" size="40"
+                           placeholder="存储桶 所属地域 比如：ap-shanghai"/>
+                    <p>直接填写我们存储桶所属地区，示范：ap-shanghai</p>
+                </td>
+            </tr>
+<tr>
+                <th scope="row">
+                   访问域名
+                </th>
+                <td>
+                    <input type="text" name="upload_url_path" value="<?php echo esc_url(get_option('upload_url_path')); ?>" size="60"
+                           placeholder="请输入COS远程地址/自定义目录"/>
+
+                    <p><b>设置事项：</b></p>
+                    <p>1. 一般我们是以：<code>http://{cos域名}</code>，不要用"<code>/</code>"结尾，支持自定义域名</p>
+                    <p>2. 支持自定义COS目录，可实现<code>{cos域名}/自定义目录</code>格式</p>
+                    <p>3. 示范1：<code>https://laojiang-xxxxx.cos.ap-shanghai.myqcloud.com</code></p>
+                    <p>4. 示范2：<code>https://laojiang-xxxxx.cos.ap-shanghai.myqcloud.com/laobuluo</code></p>
+                </td>
+            </tr>
+            <tr>
+                  <th scope="row">
+                   APPID 设置
+                </th>
+                <td>
+                    <input type="text" name="app_id" value="<?php echo esc_attr($wpcos_options['app_id']); ?>" size="40"
                            placeholder="APP ID"/>
 
                     
                 </td>
             </tr>
             <tr>
-                <td style="text-align:right;">
-                    <b>SecretId 设置：</b>
-                 </td>
+                  <th scope="row">
+                   SecretId 设置
+                </th>
+                
                 <td><input type="text" name="secret_id" value="<?php echo esc_attr($wpcos_options['secret_id']); ?>" size="50" placeholder="secretID"/></td>
             </tr>
             <tr>
-               <td style="text-align:right;">
-                    <b>SecretKey 设置：</b>
-                 </td>
+                 <th scope="row">
+                   SecretKey 设置
+                </th>
+               
                 <td>
                     <input type="text" name="secret_key" value="<?php echo esc_attr($wpcos_options['secret_key']); ?>" size="50" placeholder="secretKey"/>
                     <p>登入 <a href="https://console.qcloud.com/cam/capi" target="_blank">API密钥管理</a> 可以看到 <code>APPID | SecretId | SecretKey</code>。如果没有设置的需要创建一组。点击 <code>新建密钥</code></p>
                 </td>
             </tr>
             <tr>
-                <td style="text-align:right;">
-                    <b>自动重命名：</b>
-                </td>
+                 <th scope="row">
+                   自动重命名
+                </th>
                 <td>
                     <input type="checkbox"
                            name="auto_rename"
@@ -134,13 +120,13 @@ function wpcos_setting_page() {
 				        ?>
                     />
 
-                   <p>自动重命名，如果已有安装相关插件和脚本，可不勾选</p>
+                    <p>上传文件自动重命名，解决中文文件名或者重复文件名问题</p>
                 </td>
             </tr>
             <tr>
-                <td style="text-align:right;">
-                    <b>不在本地保存：</b>
-                </td>
+                 <th scope="row">
+                   不在本地保存
+                </th>
                 <td>
                     <input type="checkbox"
                            name="no_local_file"
@@ -151,7 +137,25 @@ function wpcos_setting_page() {
 					    ?>
                     />
 
-                    <p>如果不想同步在服务器中备份静态文件就 "勾选"。我个人喜欢只存储在腾讯云COS中，这样缓解服务器存储量。</p>
+                    <p>禁止文件保存本地。建议勾选，本地不保存，减少服务器占用资源</p>
+                </td>
+            </tr>
+			
+			<tr>
+                 <th scope="row">
+                   禁止缩略图
+                </th>
+                <td>
+                    <input type="checkbox"
+                           name="disable_thumb"
+				        <?php
+				        if (isset($wpcos_options['opt']['thumbsize'])) {
+					        echo 'checked="TRUE"';
+				        }
+				        ?>
+                    />
+
+                    <p>仅生成和上传主图，禁止缩略图裁剪。</p>
                 </td>
             </tr>
             
@@ -159,22 +163,45 @@ function wpcos_setting_page() {
                 <th>
                     
                 </th>
-                <td><input type="submit" name="submit" value="保存WPCOS设置" class="buttoncss" /></td>
+                <td><input type="submit" name="submit" value="保存设置" class="button button-primary" /></td>
 
             </tr>
-             <tr>
-                 <td style="text-align:right;">
-                    <b>注意事项：</b>
-                </td>
+            <input type="hidden" name="type" value="cos_info_set">
+        </form>
+        </table>
+        <hr>
+        <p><strong>替换说明：</strong></p>
+        <p>1. 网站本地已有静态文件，需要在测试兼容WPCOS插件之后，将本地文件对应目录上传到COS目录中(可用COSBrowser工具)</p>
+        <p>2. 初次使用对象存储插件，可以通过下面按钮一键快速替换网站内容中的原有图片地址更换为COS地址</p>
+        <p>3. 如果是从其他对象存储或者外部存储替换WPCOS插件的，可用 <a href="https://www.laobuluo.com/2693.html" target="_blank">WPReplace</a> 插件替换。</p>
+        <p>4. 建议不熟悉的朋友先备份网站和数据。</p>
+        <table class="form-table">
+        <form action="<?php echo wp_nonce_url('./admin.php?page=' . WPCOS_BASEFOLDER . '/wpcos_actions.php'); ?>" name="wpcosform2" method="post">
+
+           
+            <tr>
+               <th scope="row">
+                  一键替换
+                </th>
                 <td>
-                    <p>1. 在测试插件可用之后，已有静态文件可以使用"COSBrowser"等工具迁移【 <a href="https://cloud.tencent.com/document/product/436/11366" target="_blank">工具官方</a> 】，教程 <a href="https://www.itbulu.com/cosbrowser-cos.html" target="_blank">参考这里</a> 。</p>
-                    <p>2. 已有网站迁移静态文件后，内容数据库静态URL地址替换建议使用【wpreplace】批量替换插件。</p>
+                    <input type="hidden" name="type" value="cos_info_replace">
+                   <? if(array_key_exists('wpcos_legacy_data_replace', $wpcos_options['opt']) && $wpcos_options['opt']['wpcos_legacy_data_replace'] == 1) {
+                        echo '<input type="submit" disabled name="submit" value="已替换" class="button" />';
+                    } else {
+	                    echo '<input type="submit" name="submit" value="一键替换COS地址" class="button" />';
+                    }
+                    ?>
+                    <p>一键将本地静态文件URL替换成COS对象存储路径，不熟悉的朋友请先备份</p>
                 </td>
             </tr>
-        </table>
-        
-        <input type="hidden" name="type" value="cos_info_set">
-    </form>
+        </form>
+    </table>
+
+    <hr>
+    <div style='text-align:center;line-height: 50px;'>
+      <a href="https://www.laobuluo.com/" target="_blank">插件主页</a> | <a href="https://www.laobuluo.com/2186.html" target="_blank">插件发布页面</a> | <a href="https://jq.qq.com/?_wv=1027&k=5gBE7Pt" target="_blank">QQ群：594467847</a> | 公众号：QQ69377078（插件反馈）
+      
+    </div>
 </div>
 <?php
 }

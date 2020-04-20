@@ -1,11 +1,11 @@
-=== WPCOS ===
+=== WPCOS腾讯云对象存储COS ===
 
 Contributors: laobuluo
 Donate link: https://www.laobuluo.com/donate/
 Tags:腾讯云COS,腾讯云对象存储,腾讯云wordpress,腾讯云存储分离,腾讯云存储
 Requires at least: 4.5.0
 Tested up to: 5.4
-Stable tag: 1.3
+Stable tag: 1.5.2
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -65,6 +65,21 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 * 1. 修复媒体库删除附件不同步删除问题
 * 2. 添加随机附件命名功能
 * 3. 新增用户可自定义COS对象存储目录功能，不限制文件放置根目录
+
+= 1.4 =
+* 1. 新增禁止缩略图功能
+
+= 1.5 =
+* 1. 基于WP官方样式调整插件样式，更简洁
+* 2. 新增一键替换原来静态文件路径功能
+* 3. 重新完善插件文档说明，更易懂
+* 4. 优化禁止缩略图的逻辑，禁止系统缩略图裁剪，但是不禁止主题自带需要的缩略图
+
+= 1.5.1 =
+* 1. 修复一键替换按钮函数错误
+
+= 1.5.2 =
+* 1. 测试兼容WordPress 5.4
 
 == Upgrade Notice ==
 * 
