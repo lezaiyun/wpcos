@@ -19,7 +19,7 @@ WordPress COS（简称:WPCOS），基于腾讯云COS存储与WordPress实现静�
 
 1、插件下载地址
 
-    A - GitHub：https://github.com/laobuluo/wpcos
+    A - GitHub：https://github.com/lezaiyun/wpcos
     B - 在Wordpress插件后台直接搜索WPCOS即可下载。
 
 2、安装插件

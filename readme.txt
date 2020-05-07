@@ -4,8 +4,8 @@ Contributors: laobuluo
 Donate link: https://www.laobuluo.com/donate/
 Tags:腾讯云COS,腾讯云对象存储,腾讯云wordpress,腾讯云存储分离,腾讯云存储
 Requires at least: 4.5.0
-Tested up to: 5.4
-Stable tag: 1.5.3
+Tested up to: 5.4.1
+Stable tag: 2.1.1
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -24,7 +24,6 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 <strong>支持网站平台：</strong>
 
 * 1. 老蒋部落 <a href="https://www.itbulu.com" target="_blank" >https://www.itbulu.com</a>
-
 
 == Installation ==
 
@@ -83,6 +82,26 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 = 1.5.3 =
 * 1. 优化前端样式，密钥可视及隐藏
+
+= 2.0.0 =
+* 1. 重构部分逻辑代码，提高上传速度
+* 2. 兼容WordPress5.3及低版本，但是建议还是升级到最新版本
+* 3. 优化禁止缩略图存在的Bug
+* 4. 新增腾讯云数据万象功能，可压缩Webp格式、水印 等多个图片编辑功能
+
+= 2.0.1 =
+* 1. 解决不同步本地选项，缩略图不上传问题
+* 2. 再次优化上传逻辑和新钩子兼容问题
+* 3. 完善部分文档的描述
+* 4. 更换最新版本SDK
+* 4. 兼容支持最新WordPress5.4.1
+
+= 2.1.0 =
+* 1. 解决PHP规范部分写的短标签问题
+* 2. 感谢Chloe反馈这个问题
+
+= 2.1.1 =
+* 1. 编辑数据万象说明文档
 
 == Upgrade Notice ==
 * 

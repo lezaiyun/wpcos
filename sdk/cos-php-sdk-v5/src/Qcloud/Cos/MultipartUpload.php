@@ -2,40 +2,41 @@
 
 namespace Qcloud\Cos;
 
-use Guzzle\Http\ReadLimitEntityBody;
 use Qcloud\Cos\Exception\CosException;
+
 class MultipartUpload {
     /**
-     * const var: part size from 5MB to 5GB, and max parts of 10000 are allowed for each upload.
+     * const var: part size from 1MB to 5GB, and max parts of 10000 are allowed for each upload.
      */
-    const MIN_PART_SIZE = 5242880;
+    const MIN_PART_SIZE = 1048576;
     const MAX_PART_SIZE = 5368709120;
+    const DEFAULT_PART_SIZE = 52428800;
     const MAX_PARTS     = 10000;
 
     private $client;
-    private $source;
+    private $body;
     private $options;
     private $partSize;
 
-    public function __construct($client, $source, $minPartSize, $options = array()) {
+    public function __construct($client, $body, $options = array()) {
         $this->client = $client;
-        $this->source = $source;
+        $this->body = $body;
         $this->options = $options;
-        $this->partSize = $this->calculatePartSize($minPartSize);
+        $this->partSize = $this->calculatePartSize($options['PartSize']);
+        unset($options['PartSize']);
     }
 
     public function performUploading() {
-        $uploadId = $this->initiateMultipartUpload();
-
+        $rt = $this->initiateMultipartUpload();
+        $uploadId = $rt['UploadId'];
         $partNumber = 1;
         $parts = array();
         for (;;) {
-            if ($this->source->isConsumed()) {
+            if ($this->body->eof()) {
                 break;
             }
-
-            $body = new ReadLimitEntityBody($this->source, $this->partSize, $this->source->ftell());
-            if ($body->getContentLength() == 0) {
+            $body = $this->body->read($this->partSize);
+            if (empty($body)) {
                 break;
             }
             $result = $this->client->uploadPart(array(
@@ -70,29 +71,22 @@ class MultipartUpload {
                 'Bucket'=>$this->options['Bucket'],
                 'Key'=>$this->options['Key']));
                 $parts = array();
-        $offset = $this->partSize;
         if (count($rt['Parts']) > 0) {
             foreach ($rt['Parts'] as $part) {
                 $parts[$part['PartNumber'] - 1] = array('PartNumber' => $part['PartNumber'], 'ETag' => $part['ETag']);
             }
         }
-        for ($partNumber = 1;;++$partNumber,$offset+=$body->getContentLength()) {
-            if ($this->source->isConsumed()) {
+        for ($partNumber = 1;;++$partNumber) {
+            if ($this->body->eof()) {
                 break;
             }
+            $body = $this->body->read($this->partSize);
 
-            $body = new ReadLimitEntityBody($this->source, $this->partSize, $this->source->ftell());
-            if ($body->getContentLength() == 0) {
-                break;
-            }
-
-
-            if (array_key_exists($partNumber-1,$parts)){
+            if (array_key_exists($partNumber-1, $parts)){
 
                 if (md5($body) != substr($parts[$partNumber-1]['ETag'], 1, -1)){
                     throw new CosException("ETag check inconsistency");
                 }
-                $body->setOffset($offset);
                 continue;
             }
 
@@ -117,7 +111,7 @@ class MultipartUpload {
     }
 
     private function calculatePartSize($minPartSize) {
-        $partSize = intval(ceil(($this->source->getContentLength() / self::MAX_PARTS)));
+        $partSize = intval(ceil(($this->body->getSize() / self::MAX_PARTS)));
         $partSize = max($minPartSize, $partSize);
         $partSize = min($partSize, self::MAX_PART_SIZE);
         $partSize = max($partSize, self::MIN_PART_SIZE);
@@ -127,6 +121,6 @@ class MultipartUpload {
 
     private function initiateMultipartUpload() {
         $result = $this->client->createMultipartUpload($this->options);
-        return $result['UploadId'];
+        return $result;
     }
 }
